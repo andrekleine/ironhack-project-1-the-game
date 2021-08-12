@@ -1,11 +1,14 @@
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     background-color: black;
 }
 
 canvas {
-    margin-top: 100px;
-    /* border: 1px solid yellow; */
+    margin-top: 100px;    
 }
 
+button {
+    width: 100px;
+}
