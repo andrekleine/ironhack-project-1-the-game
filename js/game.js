@@ -1,17 +1,20 @@
 class Game {
-    constructor(canvas, context, field, player, helicopter) {
+    constructor(canvas, context, field, player, helicopter, ship, jet, fuel, house) {
       this.canvas = canvas;
       this.context = context;
       this.field = field;
-      this.jet = [];
-      this.ship = [];
+      this.jet = jet;
+      this.ship = ship;
       this.helicopter = helicopter;
-      this.fuel = [];
-      this.house = [];
+      this.fuel = fuel;
+      this.house = house;
       this.player = player;
       // GAME CONFIGS
       this.planeSpeed = 35;
-      this.heliSpeed = 10;
+      this.heliSpeed = 5;
+      this.shipSpeed = 2;
+      this.jetSpeed = 6;
+      this.shotSpeed = 6;
     }
     
     keyboardControlConfig() {
@@ -23,8 +26,12 @@ class Game {
     startGame() {
       this.clearScreen();
       this.field.drawField();
-      this.player.drawPlayer();      
-      this.helicopter.drawHeli();
+      this.player.drawObject();
+      this.fuel.drawObject();
+      this.house.drawObject();
+      this.helicopter.drawHeli(this.heliSpeed);
+      this.ship.drawShip(this.shipSpeed);
+      this.jet.drawJet(this.jetSpeed);      
       window.requestAnimationFrame(() => this.startGame());
     }
   

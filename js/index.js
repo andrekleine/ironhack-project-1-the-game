@@ -31,15 +31,42 @@ window.onload = () => {
   const heliL2 = new Image();
   heliL2.src = './images/heli-l-2.png';
 
+  // Ship
+  const shipR = new Image();
+  shipR.src = './images/ship-r.png';
+  const shipL = new Image();
+  shipL.src = './images/ship-l.png';
+
+  // Jet
+  const jetR = new Image();
+  jetR.src = './images/jet-r.png';
+  const jetL = new Image();
+  jetL.src = './images/jet-r.png';
+
+  // Fuel
+  const fuelImg = new Image();
+  fuelImg.src = './images/fuel.png';
+
+  // House
+  const houseImg = new Image();
+  houseImg.src = './images/house.png';
+
+  // Shot
   
 
   // After images are loaded, instantiate objects
-  planeImg.onload = () => {
+  planeImg.onload = () => {    
     const field = new Field(canvas, context);
     const player = new Player(canvas, context, 474, 530, 45, 49, planeImg);
-    const helicopter = new Helicopter(canvas, context, 300, 200, 50, 35, heliR1);
+    const fuel = new Fuel(canvas, context, 650, 400, 49, 84, fuelImg);
+    const house = new House(canvas, context, 80, 300, 112, 67, houseImg);
+    const helicopter = new Helicopter(canvas, context, 300, 50, 50, 35, heliR1);
     helicopter.images.push(heliR1, heliR2, heliL1, heliL2);
-    const game = new Game(canvas, context, field, player, helicopter);
+    const ship = new Ship(canvas, context, 600, 200, 100, 30, shipL);
+    ship.images.push(shipR, shipL);
+    const jet = new Jet(canvas, context, 0, 350, 56, 21, jetR);
+    jet.images.push(jetR, jetL);
+    const game = new Game(canvas, context, field, player, helicopter, ship, jet, fuel, house);
     game.keyboardControlConfig();
     game.startGame();
   }

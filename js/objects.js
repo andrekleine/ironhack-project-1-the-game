@@ -7,6 +7,10 @@ class Object {
         this.width = width;
         this.height = height;
         this.image = image;
+    }
+    
+    drawObject() {
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
     }    
 }
 
@@ -28,11 +32,19 @@ class Player extends Object {
             default:
                 this.posX += 0;
         }
+        this.shoot();
     }
 
-    drawPlayer() {
-        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
-    }    
+    // shoot() {
+    //     const shotImg = new Image();
+    //     shotImg.src = './images/shot.png';
+    //     document.onkeydown = (event) => {
+    //         if (event.key.toLowerCase() === 'ctrl') {
+    //             const shot = new Shot(this.canvas, this.context, this.posX, this.posY, 7, 25,shotImg);                
+    //         }
+    //     }
+
+    // }
 }
 
 class Helicopter extends Object {
@@ -41,10 +53,32 @@ class Helicopter extends Object {
         this.images = [];        
     }
 
-    drawHeli() {
-        setInterval(() => {
+    moveHeli(heliSpeed) {
+        if (this.image === (this.images[0] || this.images[1])) {
+            if (this.posX < 700) {
+                this.posX += heliSpeed;
+            }
+            else {
+                this.posX -= heliSpeed;
+                this.image = this.images[2];
+            }  
+        }
+        else if (this.image === (this.images[2] || this.images[3])) {
+            if (this.posX > 250) {
+                this.posX -= heliSpeed;
+            }
+            else {
+                this.posX += heliSpeed;
+                this.image = this.images[0];
+            }  
+
+        }
+    }
+
+    drawHeli(heliSpeed) {
+        this.moveHeli(heliSpeed);        
             switch(this.image) {
-                case this.images[0]:                    
+                case this.images[0]:
                     this.image = this.images[1];
                     break;
                 case this.images[1]:
@@ -56,10 +90,90 @@ class Helicopter extends Object {
                 case this.images[3]:
                     this.image = this.images[2];
                     break;
-            }
-        }, 300)
+            }        
         this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
     }    
+}
+
+class Ship extends Object {
+    constructor(canvas, context, posX, posY, width, height, image) {
+        super(canvas, context, posX, posY, width, height, image);        
+        this.images = [];        
+    }
+
+    moveShip(shipSpeed) {
+        if (this.image === this.images[0]) {
+            if (this.posX < 650) {
+                this.posX += shipSpeed;
+            }
+            else {
+                this.posX -= shipSpeed;
+                this.image = this.images[1];
+            }  
+        }
+        else if (this.image === this.images[1]) {
+            if (this.posX > 250) {
+                this.posX -= shipSpeed;
+            }
+            else {
+                this.posX += shipSpeed;
+                this.image = this.images[0];
+            }
+        }
+    }
+
+    drawShip(shipSpeed) {
+        this.moveShip(shipSpeed);
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+    }    
+}
+
+class Jet extends Object {
+    constructor(canvas, context, posX, posY, width, height, image) {
+        super(canvas, context, posX, posY, width, height, image);        
+        this.images = [];        
+    }
+
+    moveJet(jetSpeed) {
+        this.image === this.images[0] ? this.posX += jetSpeed : this.posX -= jetSpeed;
+    }
+
+    drawJet(jetSpeed) {
+        this.moveJet(jetSpeed);
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+        this.removeJet();
+    }
+
+    removeJet() {
+        if (this.posX < 0 || this.posX > 1000) delete this;
+    }
+}
+
+class Fuel extends Object {
+    constructor(canvas, context, posX, posY, width, height, image) {
+        super(canvas, context, posX, posY, width, height, image);
+    }    
+}
+
+class House extends Object {
+    constructor(canvas, context, posX, posY, width, height, image) {
+        super(canvas, context, posX, posY, width, height, image);
+    }
+}
+
+class Shot extends Object {
+    constructor(canvas, context, posX, posY, width, height, image) {
+        super(canvas, context, posX, posY, width, height, image);
+    }
+
+    moveShot(shotSpeed) {
+        this.posY -= shotSpeed;
+        this.removeShot();
+    }
+
+    removeShot() {
+        if (this.posY < 0) delete this;
+    }
 }
 
 class Field extends Object {
