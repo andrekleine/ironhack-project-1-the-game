@@ -1,5 +1,5 @@
 class Object {
-    constructor(canvas, context, posX, posY, width, height, image) {
+    constructor(canvas, context, posX, posY, width, height, image, speed) {
         this.canvas = canvas;
         this.context = context;
         this.posX = posX;
@@ -7,172 +7,156 @@ class Object {
         this.width = width;
         this.height = height;
         this.image = image;
+        this.speed = speed;
     }
     
-    drawObject() {
+    draw() {
+        this.move();
         this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
-    }    
+    }
 }
 
 class Player extends Object {
-    constructor(canvas, context, posX, posY, width, height, image) {
-        super(canvas, context, posX, posY, width, height, image);                
+    constructor(canvas, context, posX, posY, width, height, image, speed) {
+        super(canvas, context, posX, posY, width, height, image, speed);                
     }
     
-    movePlayer(key, planeSpeed) {
+    move(key) {
         switch(key) {
             case 'arrowleft':
                 if (this.posX <= 260) return;
-                this.posX -= planeSpeed;                
+                this.posX -= this.speed;
                 break;
-            case 'arrowright':
+            case 'arrowright':                
                 if (this.posX >= 685) return;
-                this.posX += planeSpeed;                
+                this.posX += this.speed;                
                 break;
             default:
                 this.posX += 0;
-        }
-        this.shoot();
+        }        
     }
-
-    // shoot() {
-    //     const shotImg = new Image();
-    //     shotImg.src = './images/shot.png';
-    //     document.onkeydown = (event) => {
-    //         if (event.key.toLowerCase() === 'ctrl') {
-    //             const shot = new Shot(this.canvas, this.context, this.posX, this.posY, 7, 25,shotImg);                
-    //         }
-    //     }
-
-    // }
 }
 
 class Helicopter extends Object {
-    constructor(canvas, context, posX, posY, width, height, image) {
-        super(canvas, context, posX, posY, width, height, image);        
-        this.images = [];        
+    constructor(canvas, context, posX, posY, width, height, image, speed) {
+        super(canvas, context, posX, posY, width, height, image, speed);        
+        this.images = [];
     }
 
-    moveHeli(heliSpeed) {
-        if (this.image === (this.images[0] || this.images[1])) {
-            if (this.posX < 700) {
-                this.posX += heliSpeed;
-            }
-            else {
-                this.posX -= heliSpeed;
-                this.image = this.images[2];
-            }  
-        }
-        else if (this.image === (this.images[2] || this.images[3])) {
-            if (this.posX > 250) {
-                this.posX -= heliSpeed;
-            }
-            else {
-                this.posX += heliSpeed;
-                this.image = this.images[0];
-            }  
-
-        }
-    }
-
-    drawHeli(heliSpeed) {
-        this.moveHeli(heliSpeed);        
-            switch(this.image) {
-                case this.images[0]:
+    move() {
+        switch (this.image) {
+            case this.images[0]:
+                if (this.posX < 700) {
+                    this.posX += this.speed;
                     this.image = this.images[1];
-                    break;
-                case this.images[1]:
-                    this.image = this.images[0];
-                    break;
-                case this.images[2]:
-                    this.image = this.images[3];
-                    break;
-                case this.images[3]:
+                }
+                else {
+                    this.posX -= this.speed;
                     this.image = this.images[2];
-                    break;
-            }        
-        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+                }
+                break;
+            case this.images[1]:
+                if (this.posX < 700) {
+                    this.posX += this.speed;
+                    this.image = this.images[0];
+                }
+                else {
+                    this.posX -= this.speed;
+                    this.image = this.images[2];
+                }
+                break;
+            case this.images[2]:
+                if (this.posX > 250) {
+                    this.posX -= this.speed;
+                    this.image = this.images[3];
+                }
+                else {
+                    this.posX += this.speed;
+                    this.image = this.images[0];
+                }
+                break;
+            case this.images[3]:
+                if (this.posX > 250) {
+                    this.posX -= this.speed;
+                    this.image = this.images[2];
+                }
+                else {
+                    this.posX += this.speed;
+                    this.image = this.images[0];
+                }
+                break;
+            default:
+                console.log('ERROR!!');
+        }
     }    
 }
 
 class Ship extends Object {
-    constructor(canvas, context, posX, posY, width, height, image) {
-        super(canvas, context, posX, posY, width, height, image);        
+    constructor(canvas, context, posX, posY, width, height, image, speed) {
+        super(canvas, context, posX, posY, width, height, image, speed);        
         this.images = [];        
     }
 
-    moveShip(shipSpeed) {
+    move() {
         if (this.image === this.images[0]) {
             if (this.posX < 650) {
-                this.posX += shipSpeed;
+                this.posX += this.speed;
             }
             else {
-                this.posX -= shipSpeed;
+                this.posX -= this.speed;
                 this.image = this.images[1];
             }  
         }
         else if (this.image === this.images[1]) {
             if (this.posX > 250) {
-                this.posX -= shipSpeed;
+                this.posX -= this.speed;
             }
             else {
-                this.posX += shipSpeed;
+                this.posX += this.speed;
                 this.image = this.images[0];
             }
         }
-    }
-
-    drawShip(shipSpeed) {
-        this.moveShip(shipSpeed);
-        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
     }    
 }
 
 class Jet extends Object {
-    constructor(canvas, context, posX, posY, width, height, image) {
-        super(canvas, context, posX, posY, width, height, image);        
+    constructor(canvas, context, posX, posY, width, height, image, speed) {
+        super(canvas, context, posX, posY, width, height, image, speed);
         this.images = [];        
     }
 
-    moveJet(jetSpeed) {
-        this.image === this.images[0] ? this.posX += jetSpeed : this.posX -= jetSpeed;
+    move() {
+        this.image === this.images[0] ? this.posX += this.speed : this.posX -= this.speed;
+    }
+}
+
+class Shot extends Object {
+    constructor(canvas, context, posX, posY, width, height, image, speed) {
+        super(canvas, context, posX, posY, width, height, image, speed);
     }
 
-    drawJet(jetSpeed) {
-        this.moveJet(jetSpeed);
-        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
-        this.removeJet();
-    }
-
-    removeJet() {
-        if (this.posX < 0 || this.posX > 1000) delete this;
+    move() {        
+        if (this.posY > 0) this.posY -= this.speed;
     }
 }
 
 class Fuel extends Object {
     constructor(canvas, context, posX, posY, width, height, image) {
         super(canvas, context, posX, posY, width, height, image);
-    }    
+    }
+
+    draw() {        
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+    }
 }
 
 class House extends Object {
     constructor(canvas, context, posX, posY, width, height, image) {
         super(canvas, context, posX, posY, width, height, image);
     }
-}
 
-class Shot extends Object {
-    constructor(canvas, context, posX, posY, width, height, image) {
-        super(canvas, context, posX, posY, width, height, image);
-    }
-
-    moveShot(shotSpeed) {
-        this.posY -= shotSpeed;
-        this.removeShot();
-    }
-
-    removeShot() {
-        if (this.posY < 0) delete this;
+    draw() {        
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
     }
 }
 
