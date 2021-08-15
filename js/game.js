@@ -1,8 +1,9 @@
 class Game {
-  constructor(canvas, context, field, player) {
+  constructor(canvas, context, field, panel, player) {
     this.canvas = canvas;
     this.context = context;
     this.field = field;
+    this.panel = panel;
     this.player = player;
     this.enemies = [];
     this.fuels = [];
@@ -72,8 +73,10 @@ class Game {
     // Draw player
     this.player.draw();
     // Show elements on screen
-    this.showEltsOnScreen();    
-    // function calling itself    
+    this.showEltsOnScreen();  
+    // Draw control panel
+    this.panel.draw();
+    // function calling itself
     window.requestAnimationFrame(() => this.startGame());
   }
   
@@ -86,13 +89,13 @@ class Game {
       if (shot.posY < 0) this.shots.splice(shot, 1);      
     });
     this.enemies.forEach(enemy => {
-      if (enemy.posY > 565 || enemy.posX > 1000) this.enemies.splice(enemy, 1);      
+      if (enemy.posY > 750 || enemy.posX > 1000) this.enemies.splice(enemy, 1);      
     });
     this.fuels.forEach(fuel => {
-      if (fuel.posY > 520) this.fuels.splice(fuel, 1);      
+      if (fuel.posY > 750) this.fuels.splice(fuel, 1);      
     });
     this.houses.forEach(house => {
-      if (house.posY > 530) this.houses.splice(house, 1);      
+      if (house.posY > 750) this.houses.splice(house, 1);      
     });
   }
 
