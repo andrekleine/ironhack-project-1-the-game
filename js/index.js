@@ -16,22 +16,17 @@ window.onload = () => {
   const canvas = document.getElementById('canvas');
   const context = canvas.getContext('2d');
   
-  // Player configs
-  const planeImg = new Image();
-  planeImg.src = './images/plane.png';
-  const planeSpeed = 35;
-
   const panelImg = new Image();
   panelImg.src = './images/panel-bar.png';
   
   // After images are loaded, instantiate objects
-  planeImg.onload = () => {    
+  panelImg.onload = () => {
     const field = new Field(canvas, context);
     const panel = new Panel(canvas, context, 0, 590, 1000, 220, panelImg);
-    const player = new Player(canvas, context, 474, 530, 45, 49, planeImg, planeSpeed);
-    const game = new Game(canvas, context, field, panel, player);
+    const game = new Game(canvas, context, field, panel);
     game.keyboardControlConfig();
     game.loadElementImgs();
-    game.startGame();
+    game.playerInst();
+    game.startGame();    
   }
 }

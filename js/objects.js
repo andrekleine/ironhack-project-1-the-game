@@ -14,27 +14,53 @@ class Object {
         this.move();
         this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
     }
+
+    top() {
+    return this.posY;
+    }
+
+    bottom() {
+    return this.posY + this.height;
+    }
+
+    left() {
+    return this.posX;
+    }
+
+    right() {
+    return this.posX + this.width;
+    }
+
+    crashWith(enemy) {
+        return !(this.bottom() < enemy.top() || this.top() > enemy.bottom() || this.right() < enemy.left() || this.left() > enemy.right());
+    }
 }
 
 class Player extends Object {
     constructor(canvas, context, posX, posY, width, height, image, speed) {
-        super(canvas, context, posX, posY, width, height, image, speed);                
+        super(canvas, context, posX, posY, width, height, image, speed);
+        this.images = [];
     }
     
     move(key) {
         switch(key) {
             case 'arrowleft':
                 if (this.posX <= 260) return;
-                this.posX -= this.speed;
+                this.posX -= this.speed;                
                 break;
             case 'arrowright':                
                 if (this.posX >= 685) return;
                 this.posX += this.speed;                
-                break;
+                break;                
             default:
                 this.posX += 0;
+                this.image = this.images[0];
         }        
     }
+
+    draw() {
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+    }    
 }
 
 class Helicopter extends Object {

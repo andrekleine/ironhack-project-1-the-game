@@ -1,28 +1,33 @@
 class Game {
-  constructor(canvas, context, field, panel, player) {
+  constructor(canvas, context, field, panel) {
     this.canvas = canvas;
     this.context = context;
     this.field = field;
-    this.panel = panel;
-    this.player = player;
+    this.panel = panel;    
+    this.player = [];
     this.enemies = [];
     this.fuels = [];
     this.houses = [];    
     this.shots = [];
     this.rollDownElts = [this.enemies, this.fuels, this.houses];
     this.drawElts = [this.fuels, this.houses, this.enemies, this.shots];
+    this.score = 0;
 
     // Element imgs
     this.images = {
+      player: [],
       heli: [],
       ship: [],
       jet: [],
       fuel: [],
       house: [],
       shot: [],
+      explosion: []
     };
     
+    // Game state
     this.frames = 0;
+    this.isGameOver = false;
 
     // CONFIGS
     // Frequencies    
@@ -32,7 +37,8 @@ class Game {
       house: 2
     };
     // Speeds    
-    this.speeds = {      
+    this.speeds = {
+      player: 35,
       heli: 4,
       ship: 2,
       jet: 10,
@@ -43,9 +49,14 @@ class Game {
   
   keyboardControlConfig() {
     document.onkeydown = (event) => {
-      this.player.move(event.key.toLowerCase());
-      if (event.key === ' ') this.shotInst();
-      };
+      if (!this.isGameOver) {
+        this.player[0].move(event.key.toLowerCase());
+        if (event.key === ' ') this.shotInst();
+      }
+      else {
+        
+      }
+    };
   }
   
   // Function that calls all game's working functions
@@ -57,7 +68,7 @@ class Game {
     // Delete elements out of screen
     this.clearElements();
     // Draw game scenario
-    this.field.drawField();
+    this.field.drawField();    
     // Roll Down elements
     this.rollDownElts.forEach(element => {
       element.forEach(item => {
@@ -70,14 +81,24 @@ class Game {
         item.draw();
       });      
     });    
-    // Draw player
-    this.player.draw();
     // Show elements on screen
-    this.showEltsOnScreen();  
+    this.showEltsOnScreen();
+    // Check for collisions
+    this.checkPlaneCollision();
+    this.checkShotEnemyCollision();
+    this.checkShotFuelCollision();    
+    // Draw player
+    this.player[0].draw();
     // Draw control panel
     this.panel.draw();
-    // function calling itself
-    window.requestAnimationFrame(() => this.startGame());
+    // Game frames update
+    if (this.isGameOver) {
+      
+    }
+    else {
+      window.requestAnimationFrame(() => this.startGame());
+    }
+    
   }
   
   clearScreen() {
@@ -126,8 +147,64 @@ class Game {
   randomPosX() {
     return Math.floor(Math.random() * (650 - 280) + 280);
   }
+
+  checkPlaneCollision() {
+    this.enemies.forEach((enemy) => {
+      if (this.player[0].crashWith(enemy)) {   
+        this.player[0].image = this.player[0].images[1];
+        this.player[0].draw();
+        setTimeout(() => {
+          this.isGameOver = true;
+        }, 30)
+      }
+    });
+  }
+
+  checkShotEnemyCollision() {
+    this.shots.forEach(shot => {
+      this.enemies.forEach((enemy) => {      
+        if (shot.crashWith(enemy)) {
+          this.shots.splice(shot, 1);
+          enemy.image = this.images.explosion[0];
+          setTimeout(() => {
+            enemy.image = this.images.explosion[1];
+            enemy.posX
+          }, 100);
+          setTimeout(() => {
+            this.enemies.splice(enemy, 1);
+          }, 200);
+        }
+      });
+    });
+  }
+
+  checkShotFuelCollision() {
+    this.shots.forEach(shot => {
+      this.fuels.forEach((fuel) => {      
+        if (shot.crashWith(fuel)) {
+          this.shots.splice(shot, 1);
+          fuel.image = this.images.explosion[0];
+          setTimeout(() => {
+            fuel.image = this.images.explosion[1];
+            fuel.posX
+          }, 100);
+          setTimeout(() => {
+            this.fuels.splice(fuel, 1);
+          }, 200);
+        }
+      });
+    });
+  }
   
   // Element instantiating functions
+  playerInst() {
+    const player = new Player(this.canvas, this.context, 474, 530, 45, 49, this.images.player[0], this.speeds.player);    
+    this.images.player.forEach(element => {
+      player.images.push(element);
+    });
+    this.player.push(player);
+  }
+
   heliInst() {
     const helicopter = new Helicopter(this.canvas, this.context, this.randomPosX(), 0, 50, 35, this.images.heli[0], this.speeds.heli);
     this.images.heli.forEach(element => {
@@ -164,11 +241,16 @@ class Game {
   }  
 
   shotInst() {
-    this.shots.push(new Shot(this.canvas, this.context, this.player.posX + 20, this.player.posY - 10, 5, 23, this.images.shot[0], this.speeds.shot));
+    this.shots.push(new Shot(this.canvas, this.context, this.player[0].posX + 20, this.player[0].posY - 10, 5, 23, this.images.shot[0], this.speeds.shot));
   }
 
   // Load elements images
   loadElementImgs() {
+    const planeImg = new Image();
+    planeImg.src = './images/plane.png';
+    const planeExpl = new Image();
+    planeExpl.src = './images/explosion-plane.png';
+    this.images.player.push(planeImg, planeExpl);    
     const heliR1 = new Image();
     heliR1.src = './images/heli-r-1.png';
     const heliR2 = new Image();
@@ -197,5 +279,10 @@ class Game {
     const shotImg = new Image();
     shotImg.src = './images/shot.png';
     this.images.shot.push(shotImg);
+    const explMin1 = new Image();
+    explMin1.src = './images/explosion-minor-1.png';
+    const explMin2 = new Image();
+    explMin2.src = './images/explosion-minor-2.png';    
+    this.images.explosion.push(explMin1, explMin2);
   }
 }
