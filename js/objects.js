@@ -39,7 +39,7 @@ class Object {
 class Player extends Object {
     constructor(canvas, context, posX, posY, width, height, image, speed) {
         super(canvas, context, posX, posY, width, height, image, speed);
-        this.images = [];
+        this.images = [];        
     }
     
     move(key) {
@@ -60,7 +60,7 @@ class Player extends Object {
 
     draw() {
         this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
-    }    
+    }
 }
 
 class Helicopter extends Object {
@@ -112,7 +112,6 @@ class Helicopter extends Object {
                 }
                 break;
             default:
-                console.log('ERROR!!');
         }
     }    
 }
@@ -193,6 +192,41 @@ class Panel extends Object {
 
     draw() {        
         this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+    }
+}
+
+class FuelMarker extends Object {
+    constructor(canvas, context, posX, posY, width, height, image) {
+        super(canvas, context, posX, posY, width, height, image);        
+    }
+
+    draw() {        
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+    }
+}
+
+class MarkerBar extends Object {
+    constructor(canvas, context, posX, posY, width, height, image) {
+        super(canvas, context, posX, posY, width, height, image);
+        this.xAxisLength = 248;
+    }
+
+    move(fuelDuration, isOverFuel) {
+        if (isOverFuel) {
+            this.posX <= 612 ? this.posX += this.xAxisLength / fuelDuration : this.posX = 612;
+        }
+        else {
+            this.posX >= 364 ? this.posX -= this.xAxisLength / fuelDuration : this.posX = 364;
+        }        
+    }
+
+    draw(fuelDuration, isOverFuel) {
+        this.move(fuelDuration, isOverFuel);
+        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
+    }
+
+    empty() {
+        if (this.posX < 364) return true;
     }
 }
 

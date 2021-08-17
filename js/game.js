@@ -1,16 +1,19 @@
 class Game {
-  constructor(canvas, context, field, panel) {
+  constructor(canvas, context, field, panel, marker) {
     this.canvas = canvas;
     this.context = context;
     this.field = field;
-    this.panel = panel;    
+    this.panel = panel;   
+    this.marker = marker; 
     this.player = [];
     this.enemies = [];
     this.fuels = [];
     this.houses = [];    
     this.shots = [];
+    this.markerBar = [];
     this.rollDownElts = [this.enemies, this.fuels, this.houses];
     this.drawElts = [this.fuels, this.houses, this.enemies, this.shots];
+    
     this.score = 0;
 
     // Element imgs
@@ -22,28 +25,31 @@ class Game {
       fuel: [],
       house: [],
       shot: [],
-      explosion: []
+      explosion: [],
+      marker: []
     };
     
     // Game state
     this.frames = 0;
+    this.fuelDuration = 1500;
     this.isGameOver = false;
+    this.isOverFuel = false;
 
     // CONFIGS
     // Frequencies    
     this.frequencies = {
-      enemy: 150,
-      fuel: 400,
+      enemy: 100,
+      fuel: 200,
       house: 2
     };
     // Speeds    
     this.speeds = {
       player: 35,
-      heli: 4,
-      ship: 2,
+      heli: 6,
+      ship: 4,
       jet: 10,
       shot: 25,
-      screen: 2
+      screen: 3
     };
   }
   
@@ -85,14 +91,19 @@ class Game {
     this.showEltsOnScreen();
     // Check for collisions
     this.checkPlaneCollision();
+    this.checkPlaneFuelCollision();
     this.checkShotEnemyCollision();
-    this.checkShotFuelCollision();    
+    this.checkShotFuelCollision();
+    // Check if fuel is empty
+    this.checkFuel();        
     // Draw player
-    this.player[0].draw();
+    this.player[0].draw();    
     // Draw control panel
     this.panel.draw();
+    this.markerBar[0].draw(this.fuelDuration, this.isOverFuel);
+    this.marker.draw();
     // Game frames update
-    if (this.isGameOver) {
+    if (this.isGameOver) {      
       
     }
     else {
@@ -160,6 +171,22 @@ class Game {
     });
   }
 
+  checkPlaneFuelCollision() {
+    this.fuels.forEach((fuel) => {
+      this.player[0].crashWith(fuel) ? this.isOverFuel = true : this.isOverFuel = false;
+    });
+  }
+  
+  checkFuel() {
+    if (this.markerBar[0].empty()) {
+      this.player[0].image = this.player[0].images[1];
+        this.player[0].draw();
+        setTimeout(() => {
+          this.isGameOver = true;
+        }, 30);
+    }
+  }
+
   checkShotEnemyCollision() {
     this.shots.forEach(shot => {
       this.enemies.forEach((enemy) => {      
@@ -172,7 +199,7 @@ class Game {
           }, 100);
           setTimeout(() => {
             this.enemies.splice(enemy, 1);
-          }, 200);
+          }, 100);
         }
       });
     });
@@ -231,7 +258,7 @@ class Game {
 
   fuelInst() {
     const fuel = new Fuel(this.canvas, this.context, this.randomPosX(), 0, 49, 84, this.images.fuel[0]);
-    this.fuels.push(fuel);
+    this.fuels.push(fuel);    
   }
 
   houseInst() {
@@ -242,6 +269,10 @@ class Game {
 
   shotInst() {
     this.shots.push(new Shot(this.canvas, this.context, this.player[0].posX + 20, this.player[0].posY - 10, 5, 23, this.images.shot[0], this.speeds.shot));
+  }
+
+  markerBarInst() {
+    this.markerBar.push(new MarkerBar(this.canvas, this.context, 612, 655, 16, 40, this.images.marker[0]));
   }
 
   // Load elements images
@@ -284,5 +315,8 @@ class Game {
     const explMin2 = new Image();
     explMin2.src = './images/explosion-minor-2.png';    
     this.images.explosion.push(explMin1, explMin2);
+    const markerBarImg = new Image();
+    markerBarImg.src = './images/fuel-marker-bar.png';  
+    this.images.marker.push(markerBarImg);
   }
 }
