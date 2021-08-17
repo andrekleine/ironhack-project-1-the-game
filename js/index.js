@@ -25,7 +25,7 @@ window.onload = () => {
   fuelMarkerImg.src = './images/fuel-marker.png';  
   
   // After images are loaded, instantiate objects
-  panelImg.onload = () => {
+  panelImg.onload = () => {    
     const field = new Field(canvas, context);
     const panel = new Panel(canvas, context, 0, 590, 1000, 220, panelImg);
     const marker = new FuelMarker(canvas, context, 340, 640, 312, 60, fuelMarkerImg);
@@ -33,7 +33,7 @@ window.onload = () => {
     game.keyboardControlConfig();
     game.loadElementImgs();
     game.markerBarInst();
-    game.playerInst();
-    game.startGame();    
+    game.playerInst();    
+    game.startGame();
   }
 }

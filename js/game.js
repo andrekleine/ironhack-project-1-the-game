@@ -13,8 +13,9 @@ class Game {
     this.markerBar = [];
     this.rollDownElts = [this.enemies, this.fuels, this.houses];
     this.drawElts = [this.fuels, this.houses, this.enemies, this.shots];
-    
+    this.allElts = [this.player, this.enemies, this.fuels, this.houses, this.shots, this.markerBar];
     this.score = 0;
+    this.lives = 3;
 
     // Element imgs
     this.images = {
@@ -29,9 +30,9 @@ class Game {
       marker: []
     };
     
-    // Game state
+    // Game state    
     this.frames = 0;
-    this.fuelDuration = 1500;
+    this.fuelDuration = 3000;
     this.isGameOver = false;
     this.isOverFuel = false;
 
@@ -51,16 +52,19 @@ class Game {
       shot: 25,
       screen: 3
     };
+    this.points = {
+      ship: 30,
+      heli: 60,
+      fuel: 80, 
+      jet: 100
+    }
   }
   
   keyboardControlConfig() {
     document.onkeydown = (event) => {
       if (!this.isGameOver) {
         this.player[0].move(event.key.toLowerCase());
-        if (event.key === ' ') this.shotInst();
-      }
-      else {
-        
+        if (event.key === ' ') this.shotInst();        
       }
     };
   }
@@ -78,7 +82,7 @@ class Game {
     // Roll Down elements
     this.rollDownElts.forEach(element => {
       element.forEach(item => {
-        item.posY += this.speeds.screen;              
+        item.posY += this.speeds.screen;        
       });      
     });
     // Draw elements
@@ -95,16 +99,23 @@ class Game {
     this.checkShotEnemyCollision();
     this.checkShotFuelCollision();
     // Check if fuel is empty
-    this.checkFuel();        
+    this.checkFuel();    
     // Draw player
     this.player[0].draw();    
     // Draw control panel
     this.panel.draw();
     this.markerBar[0].draw(this.fuelDuration, this.isOverFuel);
-    this.marker.draw();
+    this.marker.draw();    
+    // Game stats
+    this.updateScore();
+    // this.updateLives();
     // Game frames update
-    if (this.isGameOver) {      
-      
+    if (this.isGameOver) {
+      this.context.font = '100px verdana';
+      this.context.fillStyle = 'white';
+      setTimeout(() => {
+        this.context.fillText('GAME OVER', 200, 350);
+      }, 500);      
     }
     else {
       window.requestAnimationFrame(() => this.startGame());
@@ -161,12 +172,16 @@ class Game {
 
   checkPlaneCollision() {
     this.enemies.forEach((enemy) => {
-      if (this.player[0].crashWith(enemy)) {   
+      if (this.player[0].crashWith(enemy)) {  
+        enemy.image = this.images.explosion[0];
+          setTimeout(() => {
+            enemy.image = this.images.explosion[1];            
+          }, 20); 
         this.player[0].image = this.player[0].images[1];
         this.player[0].draw();
         setTimeout(() => {
           this.isGameOver = true;
-        }, 30)
+        }, 20)
       }
     });
   }
@@ -191,11 +206,11 @@ class Game {
     this.shots.forEach(shot => {
       this.enemies.forEach((enemy) => {      
         if (shot.crashWith(enemy)) {
+          this.checkEnemyPoints(enemy);
           this.shots.splice(shot, 1);
           enemy.image = this.images.explosion[0];
           setTimeout(() => {
-            enemy.image = this.images.explosion[1];
-            enemy.posX
+            enemy.image = this.images.explosion[1];            
           }, 100);
           setTimeout(() => {
             this.enemies.splice(enemy, 1);
@@ -205,10 +220,31 @@ class Game {
     });
   }
 
+  checkEnemyPoints(enemy) {
+    switch(enemy.constructor.name) {
+      case 'Ship':
+        this.score += this.points.ship;
+        break;
+      case 'Helicopter':
+        this.score += this.points.heli;
+        break;
+      case 'Jet':
+        this.score += this.points.jet;
+        break;      
+      default:
+        this.score += 0;      
+    }
+  }
+
+  checkFuelPoints() {
+    this.score += this.points.fuel;
+  }
+
   checkShotFuelCollision() {
     this.shots.forEach(shot => {
       this.fuels.forEach((fuel) => {      
         if (shot.crashWith(fuel)) {
+          this.checkFuelPoints();
           this.shots.splice(shot, 1);
           fuel.image = this.images.explosion[0];
           setTimeout(() => {
@@ -222,6 +258,18 @@ class Game {
       });
     });
   }
+
+  updateScore() {
+    this.context.font = '56px verdana';
+    this.context.fillStyle = 'yellow';
+    this.context.fillText(this.score, 820, 690);
+  }
+
+  // updateLives() {
+  //   this.context.font = '46px Tahoma';
+  //   this.context.fillStyle = 'yellow';
+  //   this.context.fillText(`Lives: ${this.lives}`, 80, 690);
+  // }
   
   // Element instantiating functions
   playerInst() {

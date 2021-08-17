@@ -48,10 +48,10 @@ class Player extends Object {
                 if (this.posX <= 260) return;
                 this.posX -= this.speed;                
                 break;
-            case 'arrowright':                
+            case 'arrowright':
                 if (this.posX >= 685) return;
-                this.posX += this.speed;                
-                break;                
+                this.posX += this.speed;
+                break;
             default:
                 this.posX += 0;
                 this.image = this.images[0];
