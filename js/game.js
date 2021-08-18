@@ -32,7 +32,7 @@ class Game {
     
     // Game state    
     this.frames = 0;
-    this.fuelDuration = 5000;
+    this.fuelDuration = 2000;
     this.isGameOver = false;
     this.isOverFuel = false;
 
@@ -60,6 +60,7 @@ class Game {
     }
   }
   
+  // CONTROLS KEYBOARD EVENTS
   keyboardControlConfig() {
     document.onkeydown = (event) => {
       if (!this.isGameOver) {
@@ -69,47 +70,25 @@ class Game {
     };
   }
   
-  // Function that calls all game's working functions
+  // MAIN FUNCTION: CALLS ALL GAME UPDATING FUNCTIONS
   startGame() {
-    // Count frames
     this.frames++;
-    // Erase whole screen
     this.clearScreen();
-    // Delete elements out of screen
     this.clearElements();
-    // Draw game scenario
     this.field.drawField();    
-    // Roll Down elements
-    this.rollDownElts.forEach(element => {
-      element.forEach(item => {
-        item.posY += this.speeds.screen;        
-      });      
-    });
-    // Draw elements
-    this.drawElts.forEach(element => {
-      element.forEach(item => {
-        item.draw();
-      });      
-    });    
-    // Show elements on screen
+    this.drawElements();
     this.showEltsOnScreen();
-    // Check for collisions
-    this.checkPlaneCollision();
-    this.checkPlaneFuelCollision();
-    this.checkShotEnemyCollision();
-    this.checkShotFuelCollision();
-    // Check if fuel is empty
-    this.checkFuel();    
-    // Draw player
-    this.player[0].draw();    
-    // Draw control panel
-    this.panel.draw();
-    this.markerBar[0].draw(this.fuelDuration, this.isOverFuel);
-    this.marker.draw();    
-    // Game stats
+    this.rollDown();
+    this.checkCollisions();
+    this.checkFuel();
+    this.player[0].draw();
+    this.drawPanel();
     this.updateScore();
-    // this.updateLives();
-    // Game frames update
+    this.gameUpdate();
+  }
+
+  // CHECKS FOR GAME OVER || KEEP CALLING startGame();
+  gameUpdate() {
     if (this.isGameOver) {
       this.context.font = '100px PressStart2P';
       this.context.fillStyle = 'white';
@@ -120,9 +99,9 @@ class Game {
     else {
       window.requestAnimationFrame(() => this.startGame());
     }
-    
   }
-  
+
+  // CLEANUP FUNCTIONS
   clearScreen() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
@@ -142,6 +121,7 @@ class Game {
     });
   }
 
+  // FEEDS ENEMIES TO ENEMIES []
   randomEnemyInst() {
     const randomEnemy = Math.floor(Math.random() * 3);
     switch (randomEnemy) {
@@ -154,6 +134,7 @@ class Game {
     }
   }
 
+  // INSTANTIATES ENEMIES, FUELS AND HOUSES x GAME FRAMES
   showEltsOnScreen() {
     if (this.frames % this.frequencies.enemy === 0) {
       this.randomEnemyInst();
@@ -166,8 +147,96 @@ class Game {
     }
   }
 
-  randomPosX() {
-    return Math.floor(Math.random() * (650 - 280) + 280);
+  // ROLLS ALL GAME ELEMENTS DOWN
+  rollDown() {
+    this.rollDownElts.forEach(element => {
+      element.forEach(item => {
+        item.posY += this.speeds.screen;        
+      });      
+    });
+  }
+
+  // DRAWS ALL ELEMENTS ON SCREEN
+  drawElements() {
+    this.drawElts.forEach(element => {
+      element.forEach(item => {
+        item.draw();
+      });      
+    });
+  }
+
+  // DRAWS PANEL ON SCREEN
+  drawPanel () {
+    this.panel.draw();
+    this.markerBar[0].draw(this.fuelDuration, this.isOverFuel);
+    this.marker.draw();
+  }  
+
+  // GATHERS ALL COLLISION FUNCTIONS
+  checkCollisions() {
+    this.crashIntoWall();
+    this.checkPlaneCollision();
+    this.checkPlaneFuelCollision();
+    this.checkShotEnemyCollision();
+    this.checkShotFuelCollision();
+  }
+  
+  // CHECKS FOR FUEL LEVEL
+  checkFuel() {
+    if (this.markerBar[0].empty()) {
+      this.player[0].image = this.player[0].images[1];
+        this.player[0].draw();
+        setTimeout(() => {
+          this.isGameOver = true;
+        }, 30);
+    }
+  }
+
+  // NEXT TWO FUNCTIONS CHECK FOR POINTS
+  checkEnemyPoints(enemy) {
+    switch(enemy.constructor.name) {
+      case 'Ship':
+        this.score += this.points.ship;
+        break;
+      case 'Helicopter':
+        this.score += this.points.heli;
+        break;
+      case 'Jet':
+        this.score += this.points.jet;
+        break;      
+      default:
+        this.score += 0;      
+    }
+  }
+
+  checkFuelPoints() {
+    this.score += this.points.fuel;
+  }
+
+  // UPDATES SCORE  
+  updateScore() {
+    this.context.font = '28px PressStart2P';
+    this.context.fillStyle = 'yellow';
+    this.context.fillText('SCORE', 770, 650);
+    this.context.font = '36px PressStart2P';
+    this.context.fillText(this.score, 765, 705 );
+  }
+
+  // updateLives() {
+  //   this.context.font = '46px Tahoma';
+  //   this.context.fillStyle = 'yellow';
+  //   this.context.fillText(`Lives: ${this.lives}`, 80, 690);
+  // }
+
+  // COLLISION FUNCTIONS
+  crashIntoWall() {
+    if (this.player[0].posX < 250 || this.player[0].posX > 710) {
+      this.player[0].image = this.player[0].images[1];
+      this.player[0].draw();
+      setTimeout(() => {
+        this.isGameOver = true;
+      }, 20)
+    }
   }
 
   checkPlaneCollision() {
@@ -191,54 +260,6 @@ class Game {
       this.player[0].crashWith(fuel) ? this.isOverFuel = true : this.isOverFuel = false;
     });
   }
-  
-  checkFuel() {
-    if (this.markerBar[0].empty()) {
-      this.player[0].image = this.player[0].images[1];
-        this.player[0].draw();
-        setTimeout(() => {
-          this.isGameOver = true;
-        }, 30);
-    }
-  }
-
-  checkShotEnemyCollision() {
-    this.shots.forEach(shot => {
-      this.enemies.forEach((enemy) => {      
-        if (shot.crashWith(enemy)) {
-          this.checkEnemyPoints(enemy);
-          this.shots.splice(shot, 1);
-          enemy.image = this.images.explosion[0];
-          setTimeout(() => {
-            enemy.image = this.images.explosion[1];            
-          }, 100);
-          setTimeout(() => {
-            this.enemies.splice(enemy, 1);
-          }, 100);
-        }
-      });
-    });
-  }
-
-  checkEnemyPoints(enemy) {
-    switch(enemy.constructor.name) {
-      case 'Ship':
-        this.score += this.points.ship;
-        break;
-      case 'Helicopter':
-        this.score += this.points.heli;
-        break;
-      case 'Jet':
-        this.score += this.points.jet;
-        break;      
-      default:
-        this.score += 0;      
-    }
-  }
-
-  checkFuelPoints() {
-    this.score += this.points.fuel;
-  }
 
   checkShotFuelCollision() {
     this.shots.forEach(shot => {
@@ -259,21 +280,29 @@ class Game {
     });
   }
 
-  updateScore() {
-    this.context.font = '28px PressStart2P';
-    this.context.fillStyle = 'yellow';
-    this.context.fillText('SCORE', 770, 650);
-    this.context.font = '36px PressStart2P';
-    this.context.fillText(this.score, 765, 705 );
+  checkShotEnemyCollision() {
+    this.shots.forEach(shot => {
+      this.enemies.forEach((enemy) => {      
+        if (shot.crashWith(enemy)) {
+          this.checkEnemyPoints(enemy);
+          this.shots.splice(shot, 1);
+          enemy.image = this.images.explosion[0];
+          setTimeout(() => {
+            enemy.image = this.images.explosion[1];            
+          }, 100);
+          setTimeout(() => {
+            this.enemies.splice(enemy, 1);
+          }, 100);
+        }
+      });
+    });
+  }
+  
+  // ELEMENT INSTANTIATING FUNCTIONS
+  randomPosX() {
+    return Math.floor(Math.random() * (650 - 280) + 280);
   }
 
-  // updateLives() {
-  //   this.context.font = '46px Tahoma';
-  //   this.context.fillStyle = 'yellow';
-  //   this.context.fillText(`Lives: ${this.lives}`, 80, 690);
-  // }
-  
-  // Element instantiating functions
   playerInst() {
     const player = new Player(this.canvas, this.context, 474, 530, 45, 49, this.images.player[0], this.speeds.player);    
     this.images.player.forEach(element => {
@@ -325,7 +354,7 @@ class Game {
     this.markerBar.push(new MarkerBar(this.canvas, this.context, 612, 655, 16, 40, this.images.marker[0]));
   }
 
-  // Load elements images
+  // LOADS ELEMENTS' IMAGES
   loadElementImgs() {
     const planeImg = new Image();
     planeImg.src = './images/plane.png';

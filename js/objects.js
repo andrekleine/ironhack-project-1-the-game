@@ -213,7 +213,7 @@ class MarkerBar extends Object {
 
     move(fuelDuration, isOverFuel) {
         if (isOverFuel) {
-            this.posX <= 612 ? this.posX += this.xAxisLength / fuelDuration : this.posX = 612;
+            this.posX <= 612 ? this.posX += (this.xAxisLength / fuelDuration) * 3 : this.posX = 612;
         }
         else {
             this.posX >= 364 ? this.posX -= this.xAxisLength / fuelDuration : this.posX = 364;
