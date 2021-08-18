@@ -64,8 +64,10 @@ class Game {
   keyboardControlConfig() {
     document.onkeydown = (event) => {
       if (!this.isGameOver) {
-        this.player[0].move(event.key.toLowerCase());
-        if (event.key === ' ') this.shotInst();        
+        // Prevent space bar to trigger "play again" button on web page
+        event.preventDefault();
+        this.player[0].move(event.key.toLowerCase());        
+        if (event.key === ' ') this.shotInst();
       }
     };
   }
