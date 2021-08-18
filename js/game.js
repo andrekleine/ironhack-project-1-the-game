@@ -88,12 +88,13 @@ class Game {
     this.gameUpdate();
   }
 
-  // CHECKS FOR GAME OVER || KEEP CALLING startGame();
+  // CHECKS FOR GAME OVER: CALL FOR NEW LIFE OR END GAME
   gameUpdate() {
+    // Recalls whole index.js, but keeping lives/score counts
     if (this.isGameOver && this.lives > 1) {     
       this.lives--;
       this.drawAfterDeath();
-      setTimeout(() => {
+      setTimeout(() => {        
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
         
@@ -115,15 +116,17 @@ class Game {
         }
       }, 2000);
     }
+    // Finishes game
     else if (this.isGameOver) {
       this.lives--;
-      this.drawAfterDeath();
+      this.drawAfterDeath();      
       this.context.font = '100px PressStart2P';
       this.context.fillStyle = 'white';      
       setTimeout(() => {
         this.context.fillText('GAME OVER', 50, 380);
       }, 1000);
     }
+    // Keep moving
     else {
       window.requestAnimationFrame(() => this.startGame());
     }

@@ -1,14 +1,42 @@
 @font-face { font-family: PressStart2P; src: url('./Press_Start_2P/PressStart2P-Regular.ttf'); } 
 
+* {
+    margin: 10px 0;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     background-color: black;
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: white;    
+}
+
+h1 {
+    margin: 0;
+    color: yellow;
+}
+
+#button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 50px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 28px;
+    margin-top: 10px;
+
 }
 
 canvas {
-    margin-top: 100px;
     font-family: 'PressStart2P, cursive';
     width: 1000px;
     height: 750px;
