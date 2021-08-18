@@ -1,5 +1,5 @@
 class Game {
-  constructor(canvas, context, field, panel, marker) {
+  constructor(canvas, context, field, panel, marker, score, lives) {
     this.canvas = canvas;
     this.context = context;
     this.field = field;
@@ -14,8 +14,8 @@ class Game {
     this.rollDownElts = [this.enemies, this.fuels, this.houses];
     this.drawElts = [this.fuels, this.houses, this.enemies, this.shots];
     this.allElts = [this.player, this.enemies, this.fuels, this.houses, this.shots, this.markerBar];
-    this.score = 0;
-    this.lives = 3;
+    this.score = score;
+    this.lives = lives;
 
     // Element imgs
     this.images = {
@@ -84,23 +84,51 @@ class Game {
     this.player[0].draw();
     this.drawPanel();
     this.updateScore();
+    this.updateLives();
     this.gameUpdate();
   }
 
   // CHECKS FOR GAME OVER || KEEP CALLING startGame();
   gameUpdate() {
-    if (this.isGameOver) {
+    if (this.isGameOver && this.lives > 1) {     
+      this.lives--;
+      this.drawAfterDeath();
+      setTimeout(() => {
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        
+        const panelImg = new Image();
+        panelImg.src = './images/panel-bar.png';
+        const fuelMarkerImg = new Image();
+        fuelMarkerImg.src = './images/fuel-marker.png';
+
+        panelImg.onload = () => {    
+          const field = new Field(canvas, context);
+          const panel = new Panel(canvas, context, 0, 590, 1000, 220, panelImg);
+          const marker = new FuelMarker(canvas, context, 340, 640, 312, 60, fuelMarkerImg);
+          const game = new Game(canvas, context, field, panel, marker, this.score, this.lives);
+          game.keyboardControlConfig();
+          game.loadElementImgs();
+          game.markerBarInst();
+          game.playerInst();    
+          game.startGame();
+        }
+      }, 2000);
+    }
+    else if (this.isGameOver) {
+      this.lives--;
+      this.drawAfterDeath();
       this.context.font = '100px PressStart2P';
-      this.context.fillStyle = 'white';
+      this.context.fillStyle = 'white';      
       setTimeout(() => {
         this.context.fillText('GAME OVER', 50, 380);
-      }, 500);      
+      }, 1000);
     }
     else {
       window.requestAnimationFrame(() => this.startGame());
     }
   }
-
+  
   // CLEANUP FUNCTIONS
   clearScreen() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -219,14 +247,17 @@ class Game {
     this.context.fillStyle = 'yellow';
     this.context.fillText('SCORE', 770, 650);
     this.context.font = '36px PressStart2P';
-    this.context.fillText(this.score, 765, 705 );
+    this.context.fillText(this.score, 767, 705 );
   }
 
-  // updateLives() {
-  //   this.context.font = '46px Tahoma';
-  //   this.context.fillStyle = 'yellow';
-  //   this.context.fillText(`Lives: ${this.lives}`, 80, 690);
-  // }
+  // UPDATES LIVES
+  updateLives() {
+    this.context.font = '28px PressStart2P';
+    this.context.fillStyle = 'yellow';
+    this.context.fillText('LIVES', 95, 650);
+    this.context.font = '36px PressStart2P';
+    this.context.fillText(this.lives, 145, 705 );
+  }
 
   // COLLISION FUNCTIONS
   crashIntoWall() {
@@ -296,6 +327,17 @@ class Game {
         }
       });
     });
+  }
+
+  // UPDATES NUMBER OF LIVES RIGHT AFTER DEATH
+  drawAfterDeath() {
+    this.clearScreen();
+      this.field.drawField();
+      this.drawElements();
+      this.player[0].draw();
+      this.drawPanel();
+      this.updateScore();
+      this.updateLives();
   }
   
   // ELEMENT INSTANTIATING FUNCTIONS
