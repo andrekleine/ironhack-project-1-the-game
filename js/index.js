@@ -22,7 +22,19 @@ window.onload = () => {
 
   // Load fuel marker img
   const fuelMarkerImg = new Image();
-  fuelMarkerImg.src = './images/fuel-marker.png';  
+  fuelMarkerImg.src = './images/fuel-marker.png';
+
+  // load google font == Monoton
+  WebFontConfig = {
+    google:{ families: ['PressStart2P'] },
+    active: function(){start();},
+  };
+  (function(){
+    var wf = document.createElement("script");
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.5.10/webfont.js';
+    wf.async = 'true';
+    document.head.appendChild(wf);
+  })();
   
   // After images are loaded, instantiate objects
   panelImg.onload = () => {    

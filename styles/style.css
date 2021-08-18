@@ -1,3 +1,5 @@
+@font-face { font-family: PressStart2P; src: url('./Press_Start_2P/PressStart2P-Regular.ttf'); } 
+
 body {
     background-color: black;
     display: flex;
@@ -5,7 +7,8 @@ body {
 }
 
 canvas {
-    margin-top: 100px;    
+    margin-top: 100px;
+    font-family: 'PressStart2P, cursive';
 }
 
 button {

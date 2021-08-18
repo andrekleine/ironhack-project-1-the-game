@@ -32,7 +32,7 @@ class Game {
     
     // Game state    
     this.frames = 0;
-    this.fuelDuration = 3000;
+    this.fuelDuration = 5000;
     this.isGameOver = false;
     this.isOverFuel = false;
 
@@ -111,10 +111,10 @@ class Game {
     // this.updateLives();
     // Game frames update
     if (this.isGameOver) {
-      this.context.font = '100px verdana';
+      this.context.font = '100px PressStart2P';
       this.context.fillStyle = 'white';
       setTimeout(() => {
-        this.context.fillText('GAME OVER', 200, 350);
+        this.context.fillText('GAME OVER', 50, 380);
       }, 500);      
     }
     else {
@@ -260,9 +260,11 @@ class Game {
   }
 
   updateScore() {
-    this.context.font = '56px verdana';
+    this.context.font = '28px PressStart2P';
     this.context.fillStyle = 'yellow';
-    this.context.fillText(this.score, 820, 690);
+    this.context.fillText('SCORE', 770, 650);
+    this.context.font = '36px PressStart2P';
+    this.context.fillText(this.score, 765, 705 );
   }
 
   // updateLives() {
