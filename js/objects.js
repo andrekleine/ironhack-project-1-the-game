@@ -185,16 +185,6 @@ class House extends Object {
     }
 }
 
-class Panel extends Object {
-    constructor(canvas, context, posX, posY, width, height, image) {
-        super(canvas, context, posX, posY, width, height, image);
-    }
-
-    draw() {        
-        this.context.drawImage(this.image, this.posX, this.posY, this.width, this.height);
-    }
-}
-
 class FuelMarker extends Object {
     constructor(canvas, context, posX, posY, width, height, image) {
         super(canvas, context, posX, posY, width, height, image);        
@@ -227,6 +217,19 @@ class MarkerBar extends Object {
 
     empty() {
         if (this.posX < 364) return true;
+    }
+}
+
+class Panel extends Object {
+    constructor(canvas, context) {
+        super(canvas, context);
+    }
+
+    drawPanel() {
+        this.context.fillStyle='#979797';
+        this.context.fillRect(0, 590, 1000, 220);
+        this.context.fillStyle='#000';
+        this.context.fillRect(0, 590, 1000, 2);
     }
 }
 

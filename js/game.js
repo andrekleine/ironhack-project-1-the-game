@@ -1,10 +1,13 @@
 class Game {
-  constructor(canvas, context, field, panel, marker, score, lives) {
-    this.canvas = canvas;
-    this.context = context;
-    this.field = field;
-    this.panel = panel;   
-    this.marker = marker; 
+  constructor(markerImg, score, lives) {
+    this.canvas = document.createElement('canvas');
+    document.getElementById('div').appendChild(this.canvas);
+    this.canvas.width = 1000;
+    this.canvas.height = 750;    
+    this.context = this.canvas.getContext('2d');
+    this.field = new Field(this.canvas, this.context);
+    this.panel = new Panel(this.canvas, this.context);    
+    this.marker = new FuelMarker(this.canvas, this.context, 340, 640, 312, 60, markerImg);
     this.player = [];
     this.enemies = [];
     this.fuels = [];
@@ -27,7 +30,8 @@ class Game {
       house: [],
       shot: [],
       explosion: [],
-      marker: []
+      marker: [], 
+      panel: []
     };
     
     // Game state    
@@ -50,7 +54,7 @@ class Game {
       ship: 4,
       jet: 10,
       shot: 25,
-      screen: 3
+      screen: 3.5
     };
     this.points = {
       ship: 30,
@@ -63,9 +67,7 @@ class Game {
   // CONTROLS KEYBOARD EVENTS
   keyboardControlConfig() {
     document.onkeydown = (event) => {
-      if (!this.isGameOver) {
-        // Prevent space bar to trigger "play again" button on web page
-        event.preventDefault();
+      if (!this.isGameOver) {        
         this.player[0].move(event.key.toLowerCase());        
         if (event.key === ' ') this.shotInst();
       }
@@ -92,30 +94,26 @@ class Game {
 
   // CHECKS FOR GAME OVER: CALL FOR NEW LIFE OR END GAME
   gameUpdate() {
-    // Recalls whole index.js, but keeping lives/score counts
+    // Recalls a whole new game but keeping lives/score counts
     if (this.isGameOver && this.lives > 1) {     
       this.lives--;
       this.drawAfterDeath();
-      setTimeout(() => {        
-        const canvas = document.getElementById('canvas');
-        const context = canvas.getContext('2d');
-        
-        const panelImg = new Image();
-        panelImg.src = './images/panel-bar.png';
-        const fuelMarkerImg = new Image();
-        fuelMarkerImg.src = './images/fuel-marker.png';
-
-        panelImg.onload = () => {    
-          const field = new Field(canvas, context);
-          const panel = new Panel(canvas, context, 0, 590, 1000, 220, panelImg);
-          const marker = new FuelMarker(canvas, context, 340, 640, 312, 60, fuelMarkerImg);
-          const game = new Game(canvas, context, field, panel, marker, this.score, this.lives);
-          game.keyboardControlConfig();
-          game.loadElementImgs();
-          game.markerBarInst();
-          game.playerInst();    
-          game.startGame();
-        }
+      setTimeout(() => {
+        const div = document.getElementById('div');
+        div.removeChild(div.childNodes[0]);
+        document.createElement('canvas');        
+        this.canvas.width = 1000;
+        this.canvas.height = 750;        
+        this.context = this.canvas.getContext('2d');
+        this.field = new Field(this.canvas, this.context);
+        this.panel = new Panel(this.canvas, this.context);    
+        this.marker = new FuelMarker(this.canvas, this.context, 340, 640, 312, 60, markerImg);
+        const game = new Game(markerImg, this.score, this.lives);
+        game.keyboardControlConfig();
+        game.loadElementImgs();
+        game.markerBarInst();
+        game.playerInst();    
+        game.startGame();
       }, 2000);
     }
     // Finishes game
@@ -127,6 +125,9 @@ class Game {
       setTimeout(() => {
         this.context.fillText('GAME OVER', 50, 380);
       }, 1000);
+      setTimeout(() => {
+        location.reload();
+      }, 3500);
     }
     // Keep moving
     else {
@@ -200,7 +201,7 @@ class Game {
 
   // DRAWS PANEL ON SCREEN
   drawPanel () {
-    this.panel.draw();
+    this.panel.drawPanel();
     this.markerBar[0].draw(this.fuelDuration, this.isOverFuel);
     this.marker.draw();
   }  
